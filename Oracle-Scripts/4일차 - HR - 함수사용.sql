@@ -267,6 +267,57 @@ from employee e, department d, salgrade s
 where e.dno = d.dno 
 and salary between losal and hisal;
 
+-- self JOIN : 자기 자신의 테이블을 조인 한다. (주로 사원의 상사 정보를 출력할 때 사용)
+    -- 별칭을 반드시 사용해야 한다.
+    
+select eno, ename, manager
+from employee
+where manager = '7788';
 
+select * from employee;
 
+select e.eno as 사원번호, e.ename as 사원이름, e.manager 직속상관번호, m.ename as "직속상관이름" 
+from employee e, employee m     -- self join : 
+where e.manager = m.eno
+order by e.ename asc;
 
+select e.ename || '의 직속상관은 ' || e.manager || '입니다.'
+from employee e, employee m
+where e.manager = m.eno
+order by e.ename asc;
+
+select eno, ename, manager, eno, ename
+from employee;
+
+-- ANSI 호환 : INNER JOIN으로 처리
+select e. eno as 사원번호, e.ename as 사원이름, e.manager 직속상관번호, m.ename as "직속상관이름" 
+from employee e join employee m
+on e.manager = m.eno
+order by e.ename asc;
+
+select e.ename || '의 직속상관은 ' || e.manager || '입니다.'
+from employee e join employee m
+on e.manager = m.eno
+order by e.ename asc;
+
+-- OUTER JOIN :
+    -- 특정 컬럼의 두 테이블에서 공통적이지 않는 내용을 출력해야 할 때
+    -- 공통적이지 않는 컬럼은 NULL 출력
+    -- + 기호를 사용해서 출력 : Oracle
+    -- ANSI 호환 : OUTER JOIN 구문을 사용해서 출력 <== 모든 DMBS에서 호환.
+    
+    -- Oracle
+    select e.ename, m.ename
+    from employee e join employee m
+    on e.manager = m.eno (+)
+    order by e.ename asc;
+    
+    -- ANSI 호환을 사용해서 출력
+        -- Left Outer JOIN : 공통적인 부분이 없더라도 왼쪽은 무조건 모두 출력
+        -- Right Outer Join : 공통적인 부분이 없더라도 오른쪽은 무조건 모두 출력
+        -- FULL outer Join : 공통적인 부분이 없더라도 양쪽 모두 무조건 모두 출력
+        
+    select e.ename, m.ename
+    from employee e right outer join employee m
+    on e.manager = m.eno
+    order by e.ename asc;
