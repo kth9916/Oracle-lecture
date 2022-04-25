@@ -191,7 +191,7 @@ where commission in (300, 500, 1400);
 
 -- F 로 시작하는 이름을 가진 사원을 모두 검색 하기.
 select * from employee
-where ename like 'A%';
+where ename like 'F%';
 
 -- 이름이 ES로 끝나는 사원을 검색하기.
 select ename from employee

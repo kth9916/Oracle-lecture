@@ -267,6 +267,8 @@ from employee e, department d, salgrade s
 where e.dno = d.dno 
 and salary between losal and hisal;
 
+se
+
 -- self JOIN : 자기 자신의 테이블을 조인 한다. (주로 사원의 상사 정보를 출력할 때 사용)
     -- 별칭을 반드시 사용해야 한다.
     
