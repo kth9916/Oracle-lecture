@@ -1,3 +1,43 @@
+/*
+    Foreign Key로 참조되는 테이블 삭제시
+        1. 자식 테이블을 먼저 삭제 후 부모 테이블 삭제
+        2. Foreign Key  제약 조건을 모두 제거 후 테이블 삭제
+        
+*/
+
+
+-- 테이블 삭제시 주의 사항 : 다른 테이블에서 Foreign Key로 자신의 테이블을 참조하고 있으면 삭제가 안됨.
+    -- 다른 테이블이 참조하고 있더라도 강제로 삭제하는 옵션 : cascade **(중요)
+
+drop table orders;
+drop table member;             -- 오류 발생 : orders 테이블의 id 컬럼이 member 테이블의 id 컬럼을 참조 하고 있다.
+drop table tb_zipcode;          -- 오류 발생 : member 테이블의 zipcode 컬럼이 tb_zipcode 테이블의 zipcode 컬럼을 참조하고 있다.
+drop table products;
+
+-- 제약 조건 제거 후 테이블 삭제 (FOREIGN KEY)
+alter table member
+drop constraint FK_MEMBER_ZIPCODE;
+
+alter table orders
+drop constraint FK_ORDERS_ID_MEMBER;
+
+alter table orders
+drop constraint FK_ORDERS_PRODUCT_CODE;
+
+-- 제약 조건 확인
+select * from user_constraints
+where table_name = 'ORDERS';
+
+-- cascade constraints 옵션을 사용해서 삭제, <== Foreign Key 제약 조건을 먼저 제거 후 삭제.
+drop table member cascade constraints; 
+drop table tb_zipcode cascade constraints;
+drop table products cascade constraints;
+drop table orders cascade constraints;
+
+-- 테이블 생성시 ( Foreign Key) : 부모 테이블(FK 참조 테이블) 을 먼저 생성해야 한다. 자식 테이블 생성
+    -- 자식 테이블을 생성할 때 FK를 넣지 않고 생성 후, 부모테이블 생성 후 , Alter table 사용해서 나중에 FK를 넣어준다. 
+
+-- 테이블 설계 --
 create table member(
     id varchar2(20) not null constraint PK_member_id Primary Key,
     pwd varchar2(20),

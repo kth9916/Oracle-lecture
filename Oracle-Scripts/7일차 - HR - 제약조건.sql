@@ -391,3 +391,263 @@ select * from orders10;
 
 drop table member;
 drop table orders;
+
+/* 제약 조건 수정(Alter Table) : 기존의 테이블에 제약 조건을 수정 */
+
+
+desc tb_zipcode;
+
+-- 트랜잭션 발생 : DML : insert, update, delete <== commit
+
+-- zip.sql 이용
+
+-- 누락 컬럼 추가 
+alter table tb_zipcode
+add ZIP_SEQ varchar2(100);
+
+-- 부족한 자리수 늘려주기
+alter table tb_zipcode
+modify bunji varchar2(100);
+
+alter table tb_zipcode
+modify dong varchar2(100);
+
+-- 컬럼 이름 변경 ( bunji ==> bunji )  수정
+alter table tb_zipcode
+rename column bungi to bunji;
+
+alter table tb_zipcode
+rename column gugum to gugun;
+
+alter table tb_zipcode;
+
+select * from user_constraints
+where table_name = 'TB_ZIPCODE';
+
+select * from user_constraints
+where table_name = 'MEMBER';
+
+-- 제약 조건 제거하거나 비활성화 하는 두 가지 방법. 강사님은 제약 조건 비활성화로 진행
+
+-- 제약 조건 잠시 비활성화 하기 . (잠시 비활성화 하기)  
+    -- <== Bulk Insert (대량으로 Insert) : 제약 조건으로 인해서 Insert 되는 속도가 굉장히 느립니다. 
+
+alter table tb_zipcode
+disable constraint PK_tb_zipcode_zipcode;       -- 오류 발생 : member 테이블의 zipcode 컬럼이 참조하고 있다.
+
+alter table tb_zipcode
+disable constraint PK_tb_zipcode_zipcode cascade;   -- Member 테이블의 FK가 적용된 제약조건도 함께 disable 
+
+select * from user_constraints
+where table_name in ( 'MEMBER', 'TB_ZIPCODE'); 
+
+select constraint_name, table_name, status from user_constraints
+where table_name in ('MEMBER','TB_ZIPCODE');
+
+select * from tb_zipcode;
+
+truncate table tb_zipcode;   --기존의 레코드만 모두 제거(빠르게 모든 레코드 삭제)
+
+delete tb_zipcoe ;          -- 기존의 레코드만 모두 제거 ( 삭제가 느리다 - 대량일 경우)
+
+commit; 
+
+-- 제약 조건 활성화 하기
+alter table member
+enable novalidate constraint FK_member_zipcode_tb_zipcode;
+
+alter table tb_zipcode
+enable novalidate constraint PK_tb_zipcode_zipcode;
+
+-- 제약 삭제 ( 연관된 FK부터 우선 삭제) / 내가 함
+alter table MEMBER
+drop constraint FK_MEMBER_ZIPCODE;
+
+alter table TB_ZIPCODE
+drop constraint PK_TB_ZIPCODE_ZIPCODE;
+
+-- drop table TB_ZIPCODE cascade constraints;  / TB_ZIPCODE 테이블의 제약 모두 삭제 / 연결된 FK 미리 제거 해야함.
+
+
+-- zip.sql 컬럼의 정렬이 제대로 안된 이유, 제대로 정렬 되도록 해 보세요.
+    -- 문자 정렬 형식으로 출력됨, to_number로 숫자로 형변환후 정렬.
+
+select * from tb_zipcode
+order by zip_seq;           -- 제대로 정렬 안됨
+
+select * from tb_zipcode
+order by to_number (zip_seq, 999999);
+
+truncate table tb_zipcode;    
+
+select count(*) from tb_zipcode;
+
+select * from tb_zipcode
+order by zip_seq *1;       -- 숫자형 문자 정렬할 때에는 *1을 해보자 / 내가 함
+
+desc tb_zipcode;
+
+
+
+select * from tb_zipcode
+where zip_seq = '3';
+
+----------------------
+
+create table emp_copy50 
+as
+select * from employee;
+
+create table dept_copy50
+as
+select * from department;
+
+select * from emp_copy50;
+select * from dept_copy50;
+
+select * from user_constraints
+where table_name in('EMPLOYEE','DEPARTMENT');
+
+select * from user_constraints
+where table_name in ('EMP_COPY50','DEPT_COPY50');
+
+-- 테이블을 복사하면 레코드만 복사가 된다. 테이블의 제약 조건은 복사되어 오지 않는다. alter table을 사용해서 제약조건을 적용
+    -- Alter Table 를 사용해서 제약조건을 적용
+
+-- Primary Key
+alter table emp_copy50
+add constraint PK_emp_copy50_eno Primary Key(eno);
+
+alter table dept_copy50
+add constraint PK_dept_copy50_dno Primary Key(dno);
+
+-- Foreign Key
+alter table emp_copy50
+add constraint FK_emp_copy50_dno_dept_copy50 Foreign Key(dno) references dept_copy50(dno);
+
+-- NOT NULL 제약 조건 추가. (구문이 다르다, add 대신에 modify 를 사용)
+desc employee;
+desc emp_copy50;        -- NOT NULL을 넣지 않았지만, Primary Key 제약 조건을 할당, 
+desc department;
+desc dept_copy50;       -- Primary Key 적용으로 자동으로 Not Null                                  
+
+    -- 기존의 null이 들어가 있는 곳에는 not null 컬럼으로 지정할 수 없다.
+
+select ename from emp_copy50 
+where ename is null;
+
+alter table emp_copy50
+modify ename constraint NN_emp_copy50_ename not null;
+
+    -- commission 컬럼에 not null 할당하기
+select * from emp_copy50;
+
+alter table emp_copy50 
+modify commission constraint NN_emp_copy50_commission not null;
+
+update emp_copy50
+set commission = 0
+where commission is null;
+
+-- Unique 제약 조건 추가 : 컬럼에 중복된 값이 있으면 할당하지 못한다.
+
+select ename, count(*)
+from emp_copy50
+group by ename
+having count(*) > 2;
+
+alter table emp_copy50
+add constraint UK_emp_copy50_ename unique(ename);
+
+-- check 제약 조건 추가
+
+select * from emp_copy50 ;
+
+alter table emp_copy50
+add constraint CK_emp_copy50_salary check(salary > 0 and salary < 10000);
+
+-- default 제약 조건 추가 < 제약조건이 아님 : 제약조건 이름을 할당할 수 없다.
+    -- 값을 넣지 않을 경우 defaul로 설정된 값이 들어간다,
+alter table emp_copy50
+modify salary default 1000;
+
+alter table emp_copy50
+modify hiredate default sysdate;
+
+insert into emp_copy50 (eno, ename, commission)
+values (9999, 'JULI',100);
+
+insert into emp_copy50
+values(8888,'JULIA',null,null,default,default,1500,null);
+
+/* 제약 조건 제거 : Alter Table 테이블명 drop */
+
+-- Primary Key 제거 : 테이블에 하나만 존재함
+
+alter table emp_copy50  -- 오류 없이 제거됨
+drop primary key ;
+
+alter table dept_copy50     -- 오류 발생 : foreign key가 참조 하기 때문에 삭제 안됨
+drop primary key;
+
+alter table dept_copy50     -- Foreign key를 먼저 제거하고 primary key 제거
+drop primary key cascade;
+
+select * from user_constraints
+where table_name in ('EMP_COPY50','DEPT_COPY50');
+
+-- not null 컬럼 제거 하기 : 제약 조건 이름으로 삭제
+alter table emp_copy50
+drop constraint NN_EMP_COPY50_ENAME;
+
+-- Unique, check 제약조건 제거 << 제약조건 이름으로 삭제>>
+alter table emp_copy50
+drop constraint UK_EMP_COPY50_Ename;
+
+alter table emp_copy50
+drop constraint CK_EMP_COPY50_SAlARY;
+
+alter table emp_copy50
+drop constraint NN_EMP_COPY50_commission;
+
+-- default는 null 허용 컬럼은 defaul null로 세팅 : default 제약 조건을 제거 하는 것
+alter table emp_copy50
+modify hiredate default null;
+
+select * from emp_copy50;
+
+/*
+    제약 조건 disable / enale
+    - 제약조건을 잠시 중지 킴.
+    - 대량(Bulk Insert) 으로 값을 테이블에 추가할 때 부하가 많이 걸린다. disable ==> enable
+    - Index를 생성시 부하가 많이 걸린다. disable ==> enable ( 잠시 멈췄다가 다시 활성화)
+*/
+
+alter table dept_copy50
+add constraint PK_dept_copy50_dno Primary key (dno);
+
+alter table emp_copy50
+add constraint PK_emp_copy50_eno Primary Key (eno);
+
+alter table emp_copy50
+add constraint FK_emp_copy50_dno foreign key(dno) references dept_copy50(dno);
+
+select * from user_constraints
+where table_name in('EMP_COPY50', 'DEPT_COPY50');
+
+select * from emp_copy50;
+select * from dept_copy50;
+
+alter table emp_copy50
+disable constraint FK_EMP_COPY50_DNO;
+
+insert into emp_copy50 (eno,ename,dno)
+values (8989,'aaaa',50);
+
+insert into dept_copy50
+values (50, 'HR','SEOUL');
+
+desc dept_copy50;
+
+alter table emp_copy50
+enable constraint FK_EMP_COPY50_dno;
