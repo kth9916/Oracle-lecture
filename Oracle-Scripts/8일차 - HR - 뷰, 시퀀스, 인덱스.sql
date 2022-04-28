@@ -53,7 +53,7 @@ as
 select ename, job, dno
 from emp_copy50;
 
-select * from simple_emp == view;   -- view를 사용해서 실제 테이블의 중요 컬럼을 숨긴다.
+select * from simple_emp = view;   -- view를 사용해서 실제 테이블의 중요 컬럼을 숨긴다.
 select * from user_views;
 
 -- 뷰를 생성할 때 반드시 별칭 이름을 사용해야 하는 경우, group by 할 때
@@ -114,11 +114,11 @@ where table_name = 'DEPT_COPY60';
 select * from v_dept;
 
 insert into v_dept
-values ('HR3','PUSAN2';
+values('HR3','PUSAN2');
 
 select * from user_views;
 
-select * from v_groupping;      -- 그룹핑된 view에는 insert 할 수 없다.
+select * from v_grouping;      -- 그룹핑된 view에는 insert 할 수 없다.
 
 create or replace view v_grouping
 as

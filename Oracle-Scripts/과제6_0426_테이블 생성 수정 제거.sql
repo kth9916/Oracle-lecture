@@ -32,6 +32,8 @@ create table emp(
     DNO number(2) null
     );
 
+-- DB 설정에 따라서, NULL 허용 여부가 다르게 셋팅되어 있을 수 있다.
+
 /*
 3. 긴이름을 넣을 수 있도록 EMP 테이블의 ENAME 컬럼의 크기를 늘리시오. 
 
@@ -43,7 +45,9 @@ DNO	number		2	NULL
 */
 
 alter table emp
-modify ENAME varchar2 (25);
+modify NAME varchar2 (25);
+
+desc emp;
 
 /*
 4. EMPLOYEE 테이블을 복사해서 EMPLOYEE2 란 이름의 테이블을 생성하되 사원번호, 이름, 급여, 
@@ -53,6 +57,9 @@ modify ENAME varchar2 (25);
 Create table employee2
 as
 select eno EMP_ID,ename NAME,salary SAL,dno DEPT_ID from employee;
+
+-- 테이블 복사시 제약조건은 복사 되지 않는다.
+    
 
 /*
 5. EMP 테이블을 삭제 하시오. 
@@ -95,11 +102,14 @@ drop unused column;
 /*
 1. EMP 테이블의 구조만 복사하여 EMP_INSERT 란 이름의 빈 테이블을 만드시오. hiredate .컬럼을 date 자료형으로 추가하세요.
 */
+select * from emp;
 
 create table EMP_INSERT
 as
 select * from EMP
-where 0 = 1;
+where 0 = 1;            -- 조건을 false로 설정하면 레코드를 가져오지 않고 테이블의 구조만 복사한다.
+
+-- 테이블에 컬럼을 추가할 때는 NULL 허용하면서 추가 해야 함.
 
 alter table emp_insert
 add hiredate date;
@@ -115,6 +125,7 @@ desc emp_insert;
 insert into emp_insert
 values (1,'김태형',5000.00,01,sysdate);
 
+commit;
 
 select * from emp_insert;
 
@@ -123,7 +134,7 @@ select * from emp_insert;
 */
 
 insert into emp_insert
-values (2,'조흥권',5000.00,02,to_date(20220425,'YYYYMMDD'));
+values (2,'조흥권',5000.00,02,to_date(sysdate -1));
 
 /*
 4. employee테이블의 구조와 내용을 복사하여 EMP_COPY란 이름의 테이블을 만드시오. 

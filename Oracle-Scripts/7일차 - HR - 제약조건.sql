@@ -131,13 +131,15 @@ drop table dept30;
 
 
 /*
-    DDL : create (생성), alter (수정), drop(삭제)
+    DDL ( Data Definition Language)
+    : create (생성), alter (수정), drop(삭제), truncate(초기화)
         << 객체>>
             테이블, 뷰, 인덱스,트리거, 시퀀스, 함수, 저장프로시져 ....
 */
 
 /*
-    DML : Insert (레코드 추가), Update( 레코드 수정), delete(레코드 삭제)
+    DML(Data Manipulation Language) 
+    : select(데이터 조회), Insert (데이터 삽입), Update( 데이터 수정), delete(데이터 삭제)
         << 테이블의 값(레코드, 로우) >>
 */
 /*
@@ -146,7 +148,7 @@ drop table dept30;
 /*
     테이블의 전체 내용이나 테이블 삭제시
     1. delete           : 테이블의 레코드를 삭제, where를 사용하지 않을시 모든 레코드 삭제. 레코드를 하나씩 삭제해서 느리다.
-    2. truncate         : 테이블의 레코드를 삭제, 속도가 굉장히 빠르다.
+    2. truncate         : 테이블의 레코드를 삭제, 속도가 굉장히 빠르다. 초기화에 가까움
     3. drop             : 테이블 자체를 삭제
 */
 
@@ -203,6 +205,20 @@ select * from dba_tables;           -- 관리자 계정에서만 실행 가능
         5. FOREIGN KEY
         6. DEFAULT
 */
+
+-- 따로 공부
+    
+    1. Primary Key :
+    Key에 해당하는 컬럼, 해당 테이블의 식별자 역할을 하는 제약 조건으로 테이블에 하나만 설정
+    즉, 테이블의 각 레코드를 구별할 수 있는 역할
+    Primary key로 설정된 컬럼에는 중복 X, 데이터의 유일성 보장, NULL값 절대로 불가
+    넓게 보면 Primary Key는 Unique Key에 포함된다고 볼 수 있음.
+    
+    2. Unique Key :
+    테이블 내 항상 유일. 중복 X, NULL 가능
+    
+    3. Foreign Key
+    다른 테이블의 기본키를 참조하는 역할
 
 -- 1. Primary Key : 중복된 값을 넣을 수 없다.
     
@@ -335,7 +351,7 @@ insert into emp_sample01 (eno, ename)
 values(2222,'홍길순');
 
 insert into emp_sample01
-values (3333,'김유신', default);
+values (3333,'김유신', default); 
 
 select * from emp_sample01;
 
@@ -437,6 +453,8 @@ disable constraint PK_tb_zipcode_zipcode;       -- 오류 발생 : member 테이블의 z
 
 alter table tb_zipcode
 disable constraint PK_tb_zipcode_zipcode cascade;   -- Member 테이블의 FK가 적용된 제약조건도 함께 disable 
+
+-- Cascade : 두 테이블을 연결해서 PK를 갖고 있는 쪽의 값을 삭제하면 FK로 연결된 값이 동시에 삭제
 
 select * from user_constraints
 where table_name in ( 'MEMBER', 'TB_ZIPCODE'); 
