@@ -75,3 +75,14 @@ quota 100m on users;
 
 select * from all_tables        -- 테이블의 소유주를 출력해 준다. 계정별로 소유한 테이블을 출력 할 수 있다.
 where owner in ('HR','USERTEST01','USERTEST02');
+
+/*
+========= 테이블 정의서 : 와인정보 제공 사이트===================
+계정명 : wine_account
+암호 : 1234
+
+기본 테이블 스페이스 : WINE_DATAFILE      << 100mb 100mb증가 무제한 <== A_HDD
+임시 테이블 스페이스 : WINE_LOG           << 100mb 100mb증가 1g    <== B_HDD
+
+테이블 10개 생성 후 : 각 테이블의 값(레코드 : 3개씩 추가)
+*/
