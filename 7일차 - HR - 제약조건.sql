@@ -409,6 +409,8 @@ drop table member;
 drop table orders;
 
 /* 제약 조건 수정(Alter Table) : 기존의 테이블에 제약 조건을 수정 */
+alter table Usertable
+add constraint PK_Userttable_ID primary key(user id);
 
 
 desc tb_zipcode;
